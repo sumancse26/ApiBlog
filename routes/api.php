@@ -26,7 +26,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 */
 
 Route::post('/create-author', [AuthorController::class, 'createAuthor']);
-Route::get('get-all-authors', [AuthorController::class, 'getAuthor']);
+Route::get('get-all-authors', [AuthorController::class, 'getAllAuthor']);
 
 /*
     | All Routes for Posts Table is Here

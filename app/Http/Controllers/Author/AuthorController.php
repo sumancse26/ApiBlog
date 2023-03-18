@@ -41,4 +41,24 @@ class AuthorController extends Controller
             ]);
         };
     }
+
+    // Get all authors
+    public function getAllAuthor()
+    {
+        try {
+            $allAuthors = Author::orderby('id')
+                ->get(['id', 'name', 'mobile', 'email', 'intro', 'profile']);
+
+            return response(([
+                'total_authors' => count($allAuthors),
+                'massage' => ' Success',
+                'response_code' => 200,
+                'getAllAuthors' => $allAuthors
+            ]));
+        } catch (Exception $ex) {
+            return response([
+                'message' => $ex
+            ]);
+        };
+    }
 }

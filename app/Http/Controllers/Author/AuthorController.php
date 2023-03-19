@@ -10,13 +10,13 @@ use Exception;
 
 class AuthorController extends Controller
 {
-    // Author create section
-    public function createAuthor(Request $request)
+    // Author registration section
+    public function register(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|unique:authors|max:255',
             'mobile' => 'required',
-            'email' => 'required',
+            'email' => 'required | email',
             'passwordHash' => 'required',
         ]);
 
@@ -25,7 +25,7 @@ class AuthorController extends Controller
             $author->name = $request->name;
             $author->mobile = $request->mobile;
             $author->email = $request->email;
-            $author->passwordHash = $request->passwordHash;
+            $author->passwordHash = bcrypt($request->passwordHash);
             $author->intro = $request->intro;
             $author->profile = $request->profile;
 
@@ -40,6 +40,52 @@ class AuthorController extends Controller
                 'message' =>  $ex
             ]);
         };
+    }
+
+    //Author login section
+    public function login(Request  $req)
+    {
+        $validated = $req->validate([
+            'email' => 'required | email',
+            'password' => 'required',
+        ]);
+
+        try {
+            $credentials = request(['email', 'password']);
+            if ($credentials && $validated) {
+                $author = Author::where('email', $req->email)
+                    ->where('passwordHash', $req->password)
+                    ->first(['id', 'name', 'email', 'mobile', 'profile']);
+                $token = $author->createToken('authToken')->plainTextToken;
+                return response()->json([
+                    'response_code' => 200,
+                    'message' => 'Success',
+                    'token' => $token,
+                    'author' => $author
+                ]);
+            } else {
+                return response()->json([
+                    'response_code' => 401,
+                    'message' => 'Not loggedIn'
+                ]);
+            }
+        } catch (Exception $ex) {
+            return $ex;
+        }
+    }
+
+    //logout author
+    public function logout(Request $req)
+    {
+        try {
+            $req->user()->currentAccessToken()->delete();
+            return response()->json([
+                'response_code' => 200,
+                'message' => 'Token deleted successfully.'
+            ]);
+        } catch (Exception $ex) {
+            return $ex;
+        }
     }
 
     // Get all authors

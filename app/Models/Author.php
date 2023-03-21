@@ -11,5 +11,5 @@ class Author extends Model
 {
     use HasFactory, HasApiTokens, Notifiable;
 
-    protected $fillable = ['name', 'mobile', 'email', 'passwordHash', 'intro', 'profile'];
+    protected $fillable = ['email', 'password'];
 }

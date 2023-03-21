@@ -14,25 +14,25 @@ class AuthorController extends Controller
     public function register(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|unique:authors|max:255',
-            'mobile' => 'required',
+            // 'name' => 'required|unique:authors|max:255',
+            // 'mobile' => 'required',
             'email' => 'required | email',
-            'passwordHash' => 'required',
+            'password' => 'required',
         ]);
 
         try {
             $author = new Author;
-            $author->name = $request->name;
-            $author->mobile = $request->mobile;
+            // $author->name = $request->name;
+            // $author->mobile = $request->mobile;
             $author->email = $request->email;
-            $author->passwordHash = bcrypt($request->passwordHash);
-            $author->intro = $request->intro;
-            $author->profile = $request->profile;
+            $author->passwordHash = bcrypt($request->password);
+            // $author->intro = $request->intro;
+            // $author->profile = $request->profile;
 
             $author->save();
 
             return response([
-                'message' => 'Success' . '. ' . $request->name . ' ' . 'added.',
+                'message' => 'Author created successfully.',
                 'response_code' => '200'
             ]);
         } catch (Exception $ex) {
@@ -66,7 +66,7 @@ class AuthorController extends Controller
             } else {
                 return response()->json([
                     'response_code' => 401,
-                    'message' => 'Not loggedIn'
+                    'message' => 'Email or password do not match'
                 ]);
             }
         } catch (Exception $ex) {

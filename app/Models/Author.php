@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
 
 class Author extends Model
 {
-    use HasFactory;
+    use HasFactory, HasApiTokens, Notifiable;
 
-    protected $fillable = ['name', 'mobile', 'email', 'passwordHash', 'intro', 'profile'];
+    protected $fillable = ['email', 'password'];
 }

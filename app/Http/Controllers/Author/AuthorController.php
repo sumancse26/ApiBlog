@@ -1,38 +1,37 @@
 <?php
 
 namespace App\Http\Controllers\Author;
+use App\Models\Author;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
-use App\Models\Author;
 use Exception;
 
 class AuthorController extends Controller
 {
-    // Author create section
-    public function createAuthor(Request $request)
+    // Author registration section
+    public function register(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|unique:authors|max:255',
-            'mobile' => 'required',
-            'email' => 'required',
-            'passwordHash' => 'required',
+            // 'name' => 'required|unique:authors|max:255',
+            // 'mobile' => 'required',
+            'email' => 'required | email',
+            'password' => 'required',
         ]);
 
         try {
             $author = new Author;
-            $author->name = $request->name;
-            $author->mobile = $request->mobile;
+            // $author->name = $request->name;
+            // $author->mobile = $request->mobile;
             $author->email = $request->email;
-            $author->passwordHash = $request->passwordHash;
-            $author->intro = $request->intro;
-            $author->profile = $request->profile;
+            $author->passwordHash = bcrypt($request->password);
+            // $author->intro = $request->intro;
+            // $author->profile = $request->profile;
 
             $author->save();
 
             return response([
-                'message' => 'Success' . '. ' . $request->name . ' ' . 'added.',
+                'message' => 'Author created successfully.',
                 'response_code' => '200'
             ]);
         } catch (Exception $ex) {
@@ -40,6 +39,74 @@ class AuthorController extends Controller
                 'message' =>  $ex
             ]);
         };
+    }
+
+    //Update author
+    public function updateAuthor(Request $req)
+    {
+        try {
+            // $author = Author::find($req->id);
+
+            // $author->name = $req->name;
+            // $author->mobile = $req->mobile;
+            // $author->intro = $req->title;
+            Author::where('id', $req->id)
+                ->update(['name' => $req->name, 'mobile' => $req->mobile, 'intro' => $req->title]);
+
+            return response()->json([
+                'message' => 'Updated successfully',
+                'response_code' => 200
+            ]);
+        } catch (Exception $ex) {
+            return $ex;
+        }
+    }
+
+
+    //Author login section
+    public function login(Request  $req)
+    {
+        $validated = $req->validate([
+            'email' => 'required | email',
+            'password' => 'required',
+        ]);
+
+        try {
+            $credentials = request(['email', 'password']);
+            if ($credentials && $validated) {
+                $author = Author::where('email', $req->email)
+                    ->where('passwordHash', $req->password)
+                    ->first(['id', 'name', 'email', 'mobile', 'profile']);
+                $token = $author->createToken('authToken')->plainTextToken;
+                return response()->json([
+                    'response_code' => 200,
+                    'message' => 'Success',
+                    'token' => $token,
+                    'author' => $author
+                ]);
+            } else {
+                return response()->json([
+                    'response_code' => 401,
+                    'message' => 'Email or password do not match'
+                ]);
+            }
+        } catch (Exception $ex) {
+            return $ex;
+        }
+    }
+
+    //logout author
+    public function logout(Request $req)
+    {
+        try {
+            $req->user()->currentAccessToken()->delete();
+            return response()->json([
+                'response_code' => 200,
+                'message' => 'Logged out successfully.'
+            ]);
+        } catch (Exception $ex) {
+            return $ex;
+        }
     }
 
     // Get all authors

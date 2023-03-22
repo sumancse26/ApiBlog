@@ -30,8 +30,12 @@ Route::post('/login', [AuthorController::class, 'login']);
 
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::post('/logout', [AuthorController::class, 'logout']);
+    /*
+        | Routes for Authors Table is Here
+    */
+    Route::get('/logout', [AuthorController::class, 'logout']);
     Route::get('/get-all-authors', [AuthorController::class, 'getAllAuthor']);
+    Route::post('/update-profile', [AuthorController::class, 'updateAuthor']);
 });
 
 

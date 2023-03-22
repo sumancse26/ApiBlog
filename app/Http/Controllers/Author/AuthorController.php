@@ -42,6 +42,28 @@ class AuthorController extends Controller
         };
     }
 
+    //Update author
+    public function updateAuthor(Request $req)
+    {
+        try {
+            // $author = Author::find($req->id);
+
+            // $author->name = $req->name;
+            // $author->mobile = $req->mobile;
+            // $author->intro = $req->title;
+            Author::where('id', $req->id)
+                ->update(['name' => $req->name, 'mobile' => $req->mobile, 'intro' => $req->title]);
+
+            return response()->json([
+                'message' => 'Updated successfully',
+                'response_code' => 200
+            ]);
+        } catch (Exception $ex) {
+            return $ex;
+        }
+    }
+
+
     //Author login section
     public function login(Request  $req)
     {
@@ -81,7 +103,7 @@ class AuthorController extends Controller
             $req->user()->currentAccessToken()->delete();
             return response()->json([
                 'response_code' => 200,
-                'message' => 'Token deleted successfully.'
+                'message' => 'Logged out successfully.'
             ]);
         } catch (Exception $ex) {
             return $ex;
